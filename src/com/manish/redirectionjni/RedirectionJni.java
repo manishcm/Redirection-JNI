@@ -58,6 +58,17 @@ public class RedirectionJni extends Activity
 		tv.setText("Click me to use stdin & stdout");
         setContentView(tv);
         
+        new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				stringFromJNI(mOutfile, mInfile);
+			}
+        	
+        }).start();
+        
+                
         tv.setOnClickListener(new View.OnClickListener() {
 			
         	/*
@@ -123,11 +134,7 @@ public class RedirectionJni extends Activity
 					}
 					
 				}).start();
-				
-				TextView tv = (TextView) v;
-				// Pass the name of the files to native code, which be used to create named pipes and achieve redirection.
-				tv.setText( stringFromJNI(mOutfile, mInfile) );
-				
+								
 			}
 		});
     }

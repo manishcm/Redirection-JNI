@@ -59,6 +59,9 @@ Java_com_manish_redirectionjni_RedirectionJni_stringFromJNI( JNIEnv* env,
 	 */
 	int out = mkfifo(outfile, 0664);
 	int fdo = open(outfile, O_WRONLY);
+
+	int in = mkfifo(infile, 0664); // Make named input file here for synchronization
+
 	dup2(fdo, 1);
 	setbuf(stdout, NULL);
 	fprintf(stdout, "This string will be written to %s", outfile);
@@ -72,12 +75,13 @@ Java_com_manish_redirectionjni_RedirectionJni_stringFromJNI( JNIEnv* env,
 	 * Step 3: Make STDIN i.e. 0, a duplicate of opened pipe file descriptor.
 	 * Step 4: Any reads from STDIN, will be actually read from the pipe and JAVA code will perform write operations.
 	 */
-	int in = mkfifo(infile, 0664);
+
 	int fdi = open(infile, O_RDONLY);
 	dup2(fdi, 0);
 	char buf[256] = "";
 	fscanf(stdin, "%*s %99[^\n]", buf); // Use this format to read white spaces.
 	close(fdi);
+	__android_log_write(ANDROID_LOG_ERROR, "Redirection1", buf);
 
 	env->ReleaseStringUTFChars(jOutfile, outfile);
 	env->ReleaseStringUTFChars(jInfile, infile);
